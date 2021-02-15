@@ -28,14 +28,14 @@ namespace API.Controllers
         {
             var user = await _dataContext.Users.SingleOrDefaultAsync(u => u.UserName == loginDto.UserName.ToLower());
 
-            if (user == null) return Unauthorized("Username not exists");
+            if (user == null) return Unauthorized("Login failed");
 
             using var hmac = new HMACSHA512(user.PasswordSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
 
             if (computedHash.Where((val, index) => val != user.Password[index]).Any())
             {
-                return Unauthorized("Invalid password");
+                return Unauthorized("Login failed");
             }
 
             return new UserDto
